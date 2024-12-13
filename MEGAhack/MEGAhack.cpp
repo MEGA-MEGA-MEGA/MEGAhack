@@ -67,21 +67,43 @@ std::wstring GetGamePath() {
 }
 //Проверяем стимовская версия или довонлайн
 int CheckGameVer(std::wstring gamePath) {
+    std::string line;
     std::ifstream inputFile(gamePath + L"/warnings.log");
     if (!inputFile) {
-        std::cout << "Файл не найден" << std::endl;
-        return 0;
+        std::cout << "Не найден абсолютный путь, переместите приложение в папку с игрой" << std::endl;
+        std::ifstream inputFile2("warnings.log");
+        if (!inputFile2) {
+            std::cout << "Файл не найден" << std::endl;
+            return 0;
+        }
+        else {
+            while (std::getline(inputFile2, line)) {
+                if (line.find("GAME -- Warhammer, 1.3") != std::string::npos) {
+                    std::cout << "Версия игры 1.3" << std::endl;
+                    return 1;
+                }
+                if (line.find("GAME -- Warhammer, 1.2") != std::string::npos) {
+                    std::cout << "Версия игры 1.2" << std::endl;
+                    return 2;
+                }
+            }
+            inputFile2.close();
+            std::cout << "Версия игры не найдена" << std::endl;
+            return 0;
+        }
     }
-    std::string line;
     while (std::getline(inputFile, line)) {
         if (line.find("GAME -- Warhammer, 1.3") != std::string::npos) {
+            std::cout << "Версия игры 1.3" << std::endl;
             return 1;
         }
         if (line.find("GAME -- Warhammer, 1.2") != std::string::npos) {
+            std::cout << "Версия игры 1.2" << std::endl;
             return 2;
         }
     }
     inputFile.close();
+    std::cout << "Версия игры не найдена" << std::endl;
     return 0;
 }
 
@@ -143,6 +165,9 @@ int main() {
     gamePath = GetGamePath();
     if (gamePath.empty()) {
         std::cout << "Путь к игре не найден" << std::endl;     
+    }
+    else {
+        std::wcout << L"Путь: " + gamePath << std::endl;
     }
     std::cout << "Нажмите F1 что бы включить мапхак" << std::endl;
     while (true) {
